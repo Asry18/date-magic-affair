@@ -137,7 +137,7 @@ function AskStep({ next }: { next: () => void }) {
         transition={{ delay: 0.5 }}
         className="font-script text-3xl text-gradient-gold sm:text-4xl"
       >
-        my dearest,
+        Hi Fazna_Faws,
       </motion.p>
 
       <motion.h1
@@ -146,7 +146,7 @@ function AskStep({ next }: { next: () => void }) {
         transition={{ delay: 0.7, duration: 1 }}
         className="mt-4 max-w-3xl font-display text-5xl font-medium leading-tight text-foreground sm:text-7xl md:text-8xl"
       >
-        Will you go on a <em className="font-script text-gradient-heart">date</em> with me?
+        Will you go on a <h1 className="font-script text-gradient-heart">DATE</h1> with me?
       </motion.h1>
 
       <motion.p
