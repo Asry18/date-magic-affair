@@ -135,7 +135,7 @@ function AskStep({ next }: { next: () => void }) {
         transition={{ delay: 0.5 }}
         className="font-script text-3xl text-gradient-gold sm:text-4xl"
       >
-        Hi Fazna_Faws,
+        Hi My_girl,
       </motion.p>
 
       <motion.h1
