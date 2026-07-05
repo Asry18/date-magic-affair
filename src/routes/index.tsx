@@ -301,6 +301,29 @@ function FoodStep({ next, setFood }: { next: () => void; setFood: (f: string) =>
 }
 
 function DoneStep({ date, food }: { date: string; food: string }) {
+  const saved = useRef(false);
+
+  useEffect(() => {
+    if (saved.current) return;
+    saved.current = true;
+
+    const submit = async () => {
+      try {
+        await saveResponse({
+          data: {
+            date,
+            food,
+          },
+        });
+
+        console.log("Response saved!");
+      } catch (err) {
+        console.error("Failed to save response:", err);
+      }
+    };
+
+    submit();
+  }, [date, food]);
   return (
     <motion.section
       key="done"
