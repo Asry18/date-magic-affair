@@ -148,7 +148,7 @@ function AskStep({ next }: { next: () => void }) {
         transition={{ delay: 0.7, duration: 1 }}
         className="mt-4 max-w-3xl font-display text-5xl font-medium leading-tight text-foreground sm:text-7xl md:text-8xl"
       >
-        Will you go on a <h1 className="font-script text-gradient-heart">DATE</h1> with me?
+        Will you go on a <span className="font-script text-gradient-heart">DATE</span> with me?
       </motion.h1>
 
       <motion.p
