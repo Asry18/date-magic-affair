@@ -11,12 +11,6 @@ export const Route = createFileRoute("/")({
 
 type Step = "ask" | "date" | "food" | "done";
 
-const dates = [
-  { day: "Friday", date: "Dec 12", note: "Cozy evening" },
-  { day: "Saturday", date: "Dec 13", note: "All night long" },
-  { day: "Sunday", date: "Dec 14", note: "Slow morning" },
-  { day: "Surprise", date: "Anytime", note: "You pick ✨" },
-];
 
 const foods = [
   { name: "Pizza", note: "Classic & cheesy", icon: Pizza },
