@@ -381,10 +381,22 @@ function ProposalPage() {
   const [step, setStep] = useState<Step>("ask");
   const [date, setDate] = useState("");
   const [food, setFood] = useState("");
+  const save = useServerFn(saveResponse);
 
   useEffect(() => {
     document.querySelector('[data-lovable-blank-page-placeholder]')?.remove();
   }, []);
+
+  const goToDone = async () => {
+    if (date && food) {
+      try {
+        await save({ data: { date, food } });
+      } catch {
+        // silently ignore — the confirmation screen still shows
+      }
+    }
+    setStep("done");
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -398,7 +410,7 @@ function ProposalPage() {
       <AnimatePresence mode="wait">
         {step === "ask" && <AskStep key="ask" next={() => setStep("date")} />}
         {step === "date" && <DateStep key="date" next={() => setStep("food")} setDate={setDate} />}
-        {step === "food" && <FoodStep key="food" next={() => setStep("done")} setFood={setFood} />}
+        {step === "food" && <FoodStep key="food" next={goToDone} setFood={setFood} />}
         {step === "done" && <DoneStep key="done" date={date} food={food} />}
       </AnimatePresence>
     </main>
