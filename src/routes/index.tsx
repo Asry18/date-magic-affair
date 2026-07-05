@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Heart, Sparkles, Calendar, Pizza, Coffee, Cake, Soup, Fish } from "lucide-react";
+import { Heart, Sparkles, Calendar as CalendarIcon, Pizza, Coffee, Cake, Soup, Fish } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 export const Route = createFileRoute("/")({
   component: ProposalPage,
