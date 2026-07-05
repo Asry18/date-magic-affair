@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Heart, Sparkles, Calendar, Pizza, Coffee, Cake, Soup, Fish } from "lucide-react";
+import { Heart, Sparkles, Calendar as CalendarIcon, Pizza, Coffee, Cake, Soup, Fish } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { useServerFn } from "@tanstack/react-start";
+import { saveResponse } from "@/lib/responses.functions";
 
 export const Route = createFileRoute("/")({
   component: ProposalPage,
@@ -9,12 +13,6 @@ export const Route = createFileRoute("/")({
 
 type Step = "ask" | "date" | "food" | "done";
 
-const dates = [
-  { day: "Friday", date: "Dec 12", note: "Cozy evening" },
-  { day: "Saturday", date: "Dec 13", note: "All night long" },
-  { day: "Sunday", date: "Dec 14", note: "Slow morning" },
-  { day: "Surprise", date: "Anytime", note: "You pick ✨" },
-];
 
 const foods = [
   { name: "Pizza", note: "Classic & cheesy", icon: Pizza },
@@ -137,7 +135,7 @@ function AskStep({ next }: { next: () => void }) {
         transition={{ delay: 0.5 }}
         className="font-script text-3xl text-gradient-gold sm:text-4xl"
       >
-        my dearest,
+        Hi Fazna_Faws,
       </motion.p>
 
       <motion.h1
@@ -146,7 +144,7 @@ function AskStep({ next }: { next: () => void }) {
         transition={{ delay: 0.7, duration: 1 }}
         className="mt-4 max-w-3xl font-display text-5xl font-medium leading-tight text-foreground sm:text-7xl md:text-8xl"
       >
-        Will you go on a <em className="font-script text-gradient-heart">date</em> with me?
+        Will you go on a <span className="font-script text-gradient-heart">DATE</span> with me?
       </motion.h1>
 
       <motion.p
@@ -186,7 +184,17 @@ function AskStep({ next }: { next: () => void }) {
 }
 
 function DateStep({ next, setDate }: { next: () => void; setDate: (d: string) => void }) {
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Date | undefined>();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const handleSelect = (d: Date | undefined) => {
+    if (!d) return;
+    setSelected(d);
+    setDate(format(d, "EEEE, MMM d, yyyy"));
+    setTimeout(next, 800);
+  };
+
   return (
     <motion.section
       key="date"
@@ -197,38 +205,42 @@ function DateStep({ next, setDate }: { next: () => void; setDate: (d: string) =>
       className="relative flex min-h-screen flex-col items-center justify-center px-6 py-20"
     >
       <FloatingHearts />
-      <Calendar className="mb-4 h-10 w-10 text-gold animate-float" />
+      <CalendarIcon className="mb-4 h-10 w-10 text-gold animate-float" />
       <p className="font-script text-3xl text-gradient-gold">yay! now…</p>
       <h2 className="mt-2 text-center font-display text-4xl font-medium sm:text-6xl">
         Pick a <span className="text-gradient-heart">day</span>
       </h2>
-      <p className="mt-3 text-center text-muted-foreground">Any one works — I'm already counting down.</p>
+      <p className="mt-3 text-center text-muted-foreground">
+        Any future day — I'm already counting down.
+      </p>
 
-      <div className="mt-12 grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {dates.map((d, i) => (
-          <motion.button
-            key={d.day}
-            onClick={() => {
-              setSelected(i);
-              setDate(`${d.day}, ${d.date}`);
-              setTimeout(next, 700);
-            }}
-            initial={{ opacity: 0, y: 30 }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="glass relative mt-10 rounded-3xl p-4 shadow-glow sm:p-8"
+      >
+        <div className="pointer-events-none absolute -right-3 -top-3">
+          <Sparkles className="h-6 w-6 text-gold animate-sparkle" />
+        </div>
+        <Calendar
+          mode="single"
+          selected={selected}
+          onSelect={handleSelect}
+          disabled={{ before: new Date(today.getTime() + 86400000) }}
+          initialFocus
+          className="pointer-events-auto [--cell-size:2.75rem]"
+        />
+        {selected && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            whileHover={{ y: -8, scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className={`glass relative overflow-hidden rounded-3xl p-6 text-left transition-all ${
-              selected === i ? "shadow-glow ring-2 ring-primary" : ""
-            }`}
+            className="mt-4 text-center font-script text-2xl text-gradient-heart"
           >
-            <div className="font-script text-2xl text-gradient-gold">{d.day}</div>
-            <div className="mt-2 font-display text-3xl font-medium">{d.date}</div>
-            <div className="mt-4 text-sm text-muted-foreground">{d.note}</div>
-            <Heart className="absolute -bottom-3 -right-3 h-16 w-16 text-primary/15" fill="currentColor" />
-          </motion.button>
-        ))}
-      </div>
+            {format(selected, "EEEE, MMM d")} 💖
+          </motion.p>
+        )}
+      </motion.div>
     </motion.section>
   );
 }
@@ -369,10 +381,22 @@ function ProposalPage() {
   const [step, setStep] = useState<Step>("ask");
   const [date, setDate] = useState("");
   const [food, setFood] = useState("");
+  const save = useServerFn(saveResponse);
 
   useEffect(() => {
     document.querySelector('[data-lovable-blank-page-placeholder]')?.remove();
   }, []);
+
+  const goToDone = async () => {
+    if (date && food) {
+      try {
+        await save({ data: { date, food } });
+      } catch {
+        // silently ignore — the confirmation screen still shows
+      }
+    }
+    setStep("done");
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -386,7 +410,7 @@ function ProposalPage() {
       <AnimatePresence mode="wait">
         {step === "ask" && <AskStep key="ask" next={() => setStep("date")} />}
         {step === "date" && <DateStep key="date" next={() => setStep("food")} setDate={setDate} />}
-        {step === "food" && <FoodStep key="food" next={() => setStep("done")} setFood={setFood} />}
+        {step === "food" && <FoodStep key="food" next={goToDone} setFood={setFood} />}
         {step === "done" && <DoneStep key="done" date={date} food={food} />}
       </AnimatePresence>
     </main>
